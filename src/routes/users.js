@@ -3,9 +3,16 @@ const router = express.Router();
 
 const db = require('../controlloers/mongoController');
 
-router.get('/register', async (req, res) => {
-  const result = await db.register();
-  res.send(result);
+router.post('/register', async (req, res) => {
+  const registerInfo = req.body;
+  const result = await db.register(registerInfo);
+  res.send(JSON.stringify(result));
+});
+
+router.post('/login', async (req, res) => {
+  const loginInfo = req.body;
+  const result = await db.login(loginInfo);
+  res.send(JSON.stringify(result));
 });
 
 module.exports = router;
