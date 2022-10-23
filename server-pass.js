@@ -1,3 +1,5 @@
+// 패스 포트 구현용 입니다! 추후 업데이트 할 예정입니다!
+
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');

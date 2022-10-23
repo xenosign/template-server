@@ -1,3 +1,4 @@
+// 필요 모듈 설정
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -10,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
+// 회원 가입, 로그인은 userRouter 에서 처리!
 const userRouter = require('./src/routes/users');
 app.use('/users', userRouter);
 
