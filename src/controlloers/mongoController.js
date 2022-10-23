@@ -1,6 +1,27 @@
 const mongoClient = require('../dbConnect/mongoConnect');
 const _client = mongoClient.connect();
 
+const crypto = require('crypto');
+
+// 비밀 번호 생성용 함수
+const createHashedPassword = (password) => {
+  const salt = crypto.randomBytes(64).toString('base64');
+  const hashedPassword = crypto
+    .pbkdf2Sync(password, salt, 10, 64, 'sha512')
+    .toString('base64');
+  return { hashedPassword, salt };
+  // 해싱할 값, salt, 해시 함수 반복 횟수, 해시 값 길이, 해시 알고리즘
+};
+
+const verifyPassword = (password, salt, userPassword) => {
+  const hashed = crypto
+    .pbkdf2Sync(password, salt, 10, 64, 'sha512')
+    .toString('base64');
+
+  if (hashed === userPassword) return true;
+  return false;
+};
+
 const Users = {
   register: async (registerInfo) => {
     const client = await _client;
@@ -12,7 +33,15 @@ const Users = {
         msg: '중복 회원 존재',
       };
     } else {
-      const result = await db.insertOne(registerInfo);
+      const hash = createHashedPassword(registerInfo.password);
+      const registerUser = {
+        email: registerInfo.email,
+        nickName: registerInfo.nickName,
+        password: hash.hashedPassword,
+        salt: hash.salt,
+      };
+
+      const result = await db.insertOne(registerUser);
       if (result.acknowledged) {
         return {
           duplicated: false,
@@ -28,9 +57,17 @@ const Users = {
     const db = client.db('template').collection('users');
     const findID = await db.findOne({ email: loginInfo.email });
     if (findID) {
-      if (loginInfo.password === findID.password) {
+      const passwordCheckResult = verifyPassword(
+        loginInfo.password,
+        findID.salt,
+        findID.password
+      );
+
+      if (passwordCheckResult) {
         return {
           result: true,
+          email: findID.email,
+          nickName: findID.nickName,
           msg: '로그인 성공! 메인 페이지로 이동 합니다.',
         };
       } else {
