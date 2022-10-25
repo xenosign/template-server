@@ -39,14 +39,23 @@ const Users = {
         msg: '중복 회원 존재',
       };
     } else {
-      // 동일한 Email 이 없으면 회원이 입력한 정보 + 비밀번호를 암호화 하여 회원 가입 처리
-      const hash = createHashedPassword(registerInfo.password);
-      const registerUser = {
-        email: registerInfo.email,
-        nickName: registerInfo.nickName,
-        password: hash.hashedPassword,
-        salt: hash.salt,
-      };
+      let registerUser = {};
+      if (registerInfo.type === 'local') {
+        const hash = createHashedPassword(registerInfo.password);
+        registerUser = {
+          type: registerInfo.type,
+          email: registerInfo.email,
+          nickName: registerInfo.nickName,
+          password: hash.hashedPassword,
+          salt: hash.salt,
+        };
+      } else {
+        registerUser = {
+          type: registerInfo.type,
+          email: registerInfo.email,
+          nickName: registerInfo.nickName,
+        };
+      }
 
       // 만들어진 회원 가입 정보 DB에 삽입!
       const result = await db.insertOne(registerUser);
