@@ -20,4 +20,10 @@ router.post('/login', async (req, res) => {
   res.send(JSON.stringify(result));
 });
 
+router.post('/mongo', async (req, res) => {
+  const result = await db.postEmendReview(1);
+  console.log(result);
+  res.send(JSON.stringify(result));
+});
+
 module.exports = router;

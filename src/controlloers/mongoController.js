@@ -106,6 +106,20 @@ const Users = {
       };
     }
   },
+  postEmendReview: async (_id) => {
+    const client = await _client;
+    const db = client.db('triplog').collection('reviews');
+    const data = await db.updateOne(
+      { id: _id, 'review.title': 'qw' },
+      { $set: { 'review.$.title': 'hi' } }
+    );
+
+    if (data.acknowledged) {
+      return true;
+    } else {
+      throw new Error('통신이상');
+    }
+  },
 };
 
 module.exports = Users;
