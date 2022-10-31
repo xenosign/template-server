@@ -10,6 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 // 회원 가입, 로그인은 userRouter 에서 처리!
 const userRouter = require('./src/routes/users');
